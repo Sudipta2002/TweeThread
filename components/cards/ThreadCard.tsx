@@ -1,3 +1,4 @@
+// "use client"
 import Image from "next/image";
 import Link from "next/link";
 
@@ -33,9 +34,11 @@ const ThreadCard =({
     community,
     createdAt,
     comments,
-    isComment
+    isComment,
+    // isLike
 }:Props)=>{
-    // console.log("hi"+content);
+    
+
     return (
         <article
       className={`flex w-full flex-col rounded-xl ${
@@ -66,8 +69,8 @@ const ThreadCard =({
 
             <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
               <div className='flex gap-3.5'>
-                <Image
-                  src='/assets/heart-gray.svg'
+                <Image //isLiked
+                  src={true? '/assets/heart-filled.svg' : '/assets/heart-gray.svg'}
                   alt='heart'
                   width={24}
                   height={24}
