@@ -136,9 +136,20 @@
 }
 
 
-/* .no-focus {
+/* 
+.no-focus {
     @apply focus-visible: ring-0 focus-visible: ring-transparent focus-visible: ring-offset-0 !important;
-} */
+}
+ */
+
+.no-focus:focus {
+    outline: 0;
+    /* Remove default focus outline */
+    box-shadow: none !important;
+    /* Remove any box shadow for focus */
+    border-color: transparent !important;
+    /* Set border color to transparent for focus */
+}
 
 
 /* Account Profile  */
@@ -160,6 +171,28 @@
 
 .comment-form {
     @apply mt-10 items-center gap-4 border-y border-y-dark-4 py-5 !important;
+}
+
+@media (max-width: 575px) {
+    .comment-form {
+        display: flex;
+        /* Equivalent to xs: flex-row */
+        flex-direction: row;
+        /* Equivalent to xs: items-center */
+    }
+    .comment-form_btn {
+        width: 5px;
+    }
+    .input-img {
+        width: 27px;
+        height: 27px;
+    }
+    .input-comment {
+        margin-left: 2px;
+    }
+    .fform {
+        gap: 0.2rem;
+    }
 }
 
 .comment-form_btn {

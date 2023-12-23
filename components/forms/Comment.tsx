@@ -45,33 +45,35 @@ const Comment=({threadId,currentUserImg,currentUserId}:Props)=>{
       form.reset();
     };
     return(
+     
         <Form {...form}>
-      <form
-        className='flex flex-row comment-form'
-        onSubmit={form.handleSubmit(onSubmit)}
-      >
-        <FormField
-          control={form.control}
-          name='thread'
-          render={({ field }) => (
-            <FormItem className='flex w-full items-center gap-3'>
-              <FormLabel>
-                <Image src={currentUserImg}alt="Profile Image" width={48} height={48} 
-                className="rounded-full object-cover"/>
-              </FormLabel>
-              <FormControl className='border-none bg-transparent'>
-                <input type="text" placeholder="Comment..." className="no-focus outline-none text-light-1" {...field} />
-              </FormControl>
-              
-            </FormItem>
-          )}
-        />
+          <form
+            className='flex flex-row comment-form'
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <FormField
+              control={form.control}
+              name='thread'
+              render={({ field }) => (
+                <FormItem className='flex w-full fform items-center gap-3'>
+                  <FormLabel>
+                    <Image src={currentUserImg}alt="Profile Image" width={48} height={48} 
+                    className="rounded-full input-img object-cover"/>
+                  </FormLabel>
+                  <FormControl className='border-none bg-transparent'>
+                    <input type="text" placeholder="Comment..." className="no-focus input-comment outline-none text-light-1" {...field} />
+                  </FormControl>
+                  
+                </FormItem>
+              )}
+              />
 
-        <Button type='submit' className=' w-48 comment-form_btn'>
-          Reply
-        </Button>
-      </form>
-    </Form>
+            <Button type='submit' className=' w-48 comment-form_btn'>
+              Reply
+            </Button>
+          </form>
+        </Form>
+     
     )
 }
 
