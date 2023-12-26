@@ -6,6 +6,8 @@ import {connectToDB}  from "../mongoose";
 
 import User from "../models/user.model";
 import Thread from "../models/thread.model";
+import { Luckiest_Guy } from "next/font/google";
+import mongoose from "mongoose";
 // import Community from "../models/community.model";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
@@ -55,8 +57,7 @@ interface Params {
   path: string,
 }
 
-export async function createThread({ text, author, communityId, path }: Params
-) {
+export async function createThread({ text, author, communityId, path }: Params) {
   try {
     connectToDB();
 
@@ -85,77 +86,9 @@ export async function createThread({ text, author, communityId, path }: Params
 
     revalidatePath(path);
   } catch (error: any) {
-    throw new Error(`Failed to create thread: ${error.message}`);
+    throw new Error(`Failed to create thread: ${error}`);
   }
 }
-
-// async function fetchAllChildThreads(threadId: string): Promise<any[]> {
-//   const childThreads = await Thread.find({ parentId: threadId });
-
-//   const descendantThreads = [];
-//   for (const childThread of childThreads) {
-//     const descendants = await fetchAllChildThreads(childThread._id);
-//     descendantThreads.push(childThread, ...descendants);
-//   }
-
-//   return descendantThreads;
-// }
-
-// export async function deleteThread(id: string, path: string): Promise<void> {
-//   try {
-//     connectToDB();
-
-//     // Find the thread to be deleted (the main thread)
-//     const mainThread = await Thread.findById(id).populate("author community");
-
-//     if (!mainThread) {
-//       throw new Error("Thread not found");
-//     }
-
-//     // Fetch all child threads and their descendants recursively
-//     const descendantThreads = await fetchAllChildThreads(id);
-
-//     // Get all descendant thread IDs including the main thread ID and child thread IDs
-//     const descendantThreadIds = [
-//       id,
-//       ...descendantThreads.map((thread) => thread._id),
-//     ];
-
-//     // Extract the authorIds and communityIds to update User and Community models respectively
-//     const uniqueAuthorIds = new Set(
-//       [
-//         ...descendantThreads.map((thread) => thread.author?._id?.toString()), // Use optional chaining to handle possible undefined values
-//         mainThread.author?._id?.toString(),
-//       ].filter((id) => id !== undefined)
-//     );
-
-//     const uniqueCommunityIds = new Set(
-//       [
-//         ...descendantThreads.map((thread) => thread.community?._id?.toString()), // Use optional chaining to handle possible undefined values
-//         mainThread.community?._id?.toString(),
-//       ].filter((id) => id !== undefined)
-//     );
-
-//     // Recursively delete child threads and their descendants
-//     await Thread.deleteMany({ _id: { $in: descendantThreadIds } });
-
-//     // Update User model
-//     await User.updateMany(
-//       { _id: { $in: Array.from(uniqueAuthorIds) } },
-//       { $pull: { threads: { $in: descendantThreadIds } } }
-//     );
-
-//     // Update Community model
-//     await Community.updateMany(
-//       { _id: { $in: Array.from(uniqueCommunityIds) } },
-//       { $pull: { threads: { $in: descendantThreadIds } } }
-//     );
-
-//     revalidatePath(path);
-//   } catch (error: any) {
-//     throw new Error(`Failed to delete thread: ${error.message}`);
-//   }
-// }
 
 export async function fetchThreadById(threadId: string) {
   connectToDB();
@@ -190,6 +123,13 @@ export async function fetchThreadById(threadId: string) {
             },
           },
         ],
+      }).populate({
+        path:"likes",
+        populate:{
+          path:"author",
+          model: User,
+          select:"_id name image"
+        }
       })
       .exec();
 
@@ -239,3 +179,77 @@ export async function addCommentToThread(
   }
 }
 
+// export async function addLikeToThread(
+//   threadId: string,
+//   userId: string,
+// ) {
+//   connectToDB();
+
+
+//   try {
+//       // Find the original thread by its ID
+//       const originalThread = await fetchThreadById(threadId);
+//       console.log(originalThread);
+      
+//       if (!originalThread) {
+//         throw new Error("Thread not found");
+//       }
+//       console.log(originalThread.likes);
+      
+      
+//       // Check if the user already liked the thread
+//        let hasLiked = originalThread.likes.some(({like}:any )=>{ like.user.toString() === userId});
+
+//        if (hasLiked) {
+//          // If the user has already liked the thread, remove the like
+//          originalThread.likes = originalThread.likes.filter(({like}:any )=>{ like.user.toString() === userId});
+//        } else {
+//          // If the user hasn't liked the thread, add the like
+//          console.log("Hitted the like butttonnnn");
+//          console.log({ user: userId });
+//          originalThread.likes.push({ user: userId });
+//        }
+//        await originalThread.save();
+//       //  hasLiked = originalThread.likes.some(({like}:any )=>{ like.user.toString() === userId});
+//       //  // Save the updated thread with likes added/removed
+//       //  if(hasLiked)return true;
+//       //  return false;
+//     } catch (err) {
+//       console.error("Error while adding comment:", err);
+//       throw new Error("Unable to add comment");
+//     }
+// }
+export async function addLikeToThread(
+  threadId: string,
+  userId: string,
+  ) {
+  try {
+    // Find the original thread by its ID
+    const originalThread = await Thread.findById(threadId);
+
+    if (!originalThread) {
+      throw new Error('Thread not found');
+    }
+
+    // Check if the user already liked the thread
+    const alreadyLikedIndex = originalThread.likes.findIndex(({like}:any) => like.user.toString() === userId);
+
+    if (alreadyLikedIndex !== -1) {
+      // If the user has already liked the thread, remove the like
+      originalThread.likes.splice(alreadyLikedIndex, 1);
+    } else {
+      // If the user hasn't liked the thread, add the like
+      var objectId = new mongoose.Types.ObjectId('569ed8269353e9f4c51617aa');
+      originalThread.likes.push({ user: objectId });
+    }
+
+    // Save the updated thread back to the database
+    await originalThread.save();
+
+    // Return the updated thread or a success message if needed
+    return originalThread;
+  } catch (err) {
+    console.error('Error while adding/removing like:', err);
+    throw new Error('Unable to add/remove like');
+  }
+}

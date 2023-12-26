@@ -1,6 +1,7 @@
 // "use client"
 import Image from "next/image";
 import Link from "next/link";
+import LikedBtn from "./LikedBtn";
 
 interface Props{
     id : string;
@@ -24,6 +25,11 @@ interface Props{
         }
     }[];
     isComment?: boolean;
+    isLike: {
+      author:{
+        id:string;
+      }
+  }[];
 }
 const ThreadCard =({
     id,
@@ -35,9 +41,11 @@ const ThreadCard =({
     createdAt,
     comments,
     isComment,
-    // isLike
+    isLike
 }:Props)=>{
-    
+
+    let objectId=id;
+    const idString = objectId.toString();
 
     return (
         <article
@@ -69,13 +77,7 @@ const ThreadCard =({
 
             <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
               <div className='flex gap-3.5'>
-                <Image //isLiked
-                  src={true? '/assets/heart-filled.svg' : '/assets/heart-gray.svg'}
-                  alt='heart'
-                  width={24}
-                  height={24}
-                  className='cursor-pointer object-contain'
-                />
+                <LikedBtn threadId={idString} currentUserId={currentUserId} isLike={isLike}/>
                 <Link href={`/thread/${id}`}>
                   <Image
                     src='/assets/reply.svg'

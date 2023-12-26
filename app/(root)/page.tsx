@@ -1,4 +1,3 @@
-// "use client";
 import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchPosts } from "@/lib/actions/thread.action";
 import { currentUser } from "@clerk/nextjs";
@@ -6,7 +5,7 @@ import { currentUser } from "@clerk/nextjs";
 export default async function Home() {
   const result= await fetchPosts(1,30);
   const user = await currentUser();
-  console.log(result);
+  // console.log(result);
   return (
     <>
       <h1 className="head-text text-light-1 text-heading2-bold  text-left">Home</h1>
@@ -27,6 +26,7 @@ export default async function Home() {
                   community={post.community}
                   createdAt={post.createdAt}
                   comments={post.children}
+                  isLike={post?.likes}
                 />
               ))}
             </>

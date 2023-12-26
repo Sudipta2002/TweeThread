@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CommentValidation } from "@/lib/validations/thread";
 import Image from "next/image";
 import { addCommentToThread } from "@/lib/actions/thread.action";
+// import LikedBtn from "../cards/LikedBtn";
 // import { Input } from "../ui/input";
 // import { createThread } from "@/lib/actions/thread.action";
 interface Props{
@@ -45,7 +46,7 @@ const Comment=({threadId,currentUserImg,currentUserId}:Props)=>{
       form.reset();
     };
     return(
-     
+      
         <Form {...form}>
           <form
             className='flex flex-row comment-form'
@@ -61,14 +62,16 @@ const Comment=({threadId,currentUserImg,currentUserId}:Props)=>{
                     className="rounded-full input-img object-cover"/>
                   </FormLabel>
                   <FormControl className='border-none bg-transparent'>
-                    <input type="text" placeholder="Comment..." className="no-focus input-comment outline-none text-light-1" {...field} />
+                    <input type="text" placeholder="Comment..." className="no-focus w-full input-comment outline-none text-light-1" {...field} />
                   </FormControl>
                   
                 </FormItem>
               )}
               />
-
-            <Button type='submit' className=' w-48 comment-form_btn'>
+            {/* <LikedBtn threadId={threadId} currentUserId={currentUserId} isLike={isLike}/> */}
+            <Button 
+            type='submit' 
+            className=' w-48 comment-form_btn'>
               Reply
             </Button>
           </form>
