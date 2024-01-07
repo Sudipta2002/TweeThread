@@ -19,15 +19,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { CommentValidation } from "@/lib/validations/thread";
 import Image from "next/image";
 import { addCommentToThread } from "@/lib/actions/thread.action";
-// import LikedBtn from "../cards/LikedBtn";
+import LikedBtn from "../cards/LikedBtn";
 // import { Input } from "../ui/input";
 // import { createThread } from "@/lib/actions/thread.action";
 interface Props{
     threadId:string;
     currentUserImg:string;
     currentUserId:string;
+    isLike: {
+      author:{
+        id:string;
+      }
+  }[];
 }
-const Comment=({threadId,currentUserImg,currentUserId}:Props)=>{
+const Comment=({threadId,currentUserImg,currentUserId,isLike}:Props)=>{
     const router = useRouter();
     const pathname = usePathname();
   

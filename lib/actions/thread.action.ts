@@ -7,7 +7,7 @@ import {connectToDB}  from "../mongoose";
 import User from "../models/user.model";
 import Thread from "../models/thread.model";
 import { Luckiest_Guy } from "next/font/google";
-import mongoose from "mongoose";
+import mongoose from "mongoose";import { ObjectId } from 'mongodb';
 // import Community from "../models/community.model";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
@@ -125,11 +125,11 @@ export async function fetchThreadById(threadId: string) {
         ],
       }).populate({
         path:"likes",
-        populate:{
-          path:"author",
-          model: User,
-          select:"_id name image"
-        }
+        model: Thread,
+        select:"_id"
+        // populate:{
+        //   path:"likes",
+        // }
       })
       .exec();
 
@@ -198,58 +198,120 @@ export async function addCommentToThread(
       
       
 //       // Check if the user already liked the thread
-//        let hasLiked = originalThread.likes.some(({like}:any )=>{ like.user.toString() === userId});
+//        let hasLiked = originalThread.likes.some(({like}:any )=>{ like.toString() === userId});
 
 //        if (hasLiked) {
 //          // If the user has already liked the thread, remove the like
-//          originalThread.likes = originalThread.likes.filter(({like}:any )=>{ like.user.toString() === userId});
+//          originalThread.likes = originalThread.likes.filter(({like}:any )=>{ like.toString() === userId});
 //        } else {
 //          // If the user hasn't liked the thread, add the like
 //          console.log("Hitted the like butttonnnn");
 //          console.log({ user: userId });
-//          originalThread.likes.push({ user: userId });
+       
+//          originalThread.likes.push(userId);
+//           await originalThread.save();
+//          console.log(originalThread);
 //        }
-//        await originalThread.save();
-//       //  hasLiked = originalThread.likes.some(({like}:any )=>{ like.user.toString() === userId});
-//       //  // Save the updated thread with likes added/removed
-//       //  if(hasLiked)return true;
-//       //  return false;
+      
 //     } catch (err) {
-//       console.error("Error while adding comment:", err);
-//       throw new Error("Unable to add comment");
+//       console.error("Error while liking comment:", err);
+//       throw new Error("Unable to like comment");
 //     }
 // }
-export async function addLikeToThread(
-  threadId: string,
-  userId: string,
-  ) {
+// export async function addLikeToThread(
+//   threadId: string,
+//   userId: string,
+//   ) {
+//   try {
+//     // Find the original thread by its ID
+//     const originalThread = await fetchThreadById(threadId);
+//     console.log(originalThread);
+//     if (!originalThread) {
+//       throw new Error('Thread not found');
+//     }
+
+//     // Check if the user already liked the thread
+//     const alreadyLikedIndex = originalThread.likes.findIndex(({like}:any) => like.toString() === userId);
+//     console.log(alreadyLikedIndex);
+
+//     if (alreadyLikedIndex !== -1) {
+//       // If the user has already liked the thread, remove the like
+//       originalThread.likes.splice(alreadyLikedIndex, 1);
+//     } else {
+//       // If the user hasn't liked the thread, add the like
+//       // var objectId = new mongoose.Types.ObjectId('569ed8269353e9f4c51617aa');
+//       console.log(userId );
+//       originalThread.likes.push( userId );
+//     }
+
+//     // Save the updated thread back to the database
+//     await originalThread.save();
+
+//     // Return the updated thread or a success message if needed
+//     // return originalThread;
+//   } catch (err) {
+//     console.error('Error while adding/removing like:', err);
+//     throw new Error('Unable to add/remove like');
+//   }
+// }
+export async function addLikeToThread(threadId: string, userId: string) {
   try {
     // Find the original thread by its ID
     const originalThread = await Thread.findById(threadId);
-
+    console.log(originalThread);
+    
     if (!originalThread) {
       throw new Error('Thread not found');
     }
 
+    const userIdObject = {userId};
+    // console.log(userIdObject);
+    
     // Check if the user already liked the thread
-    const alreadyLikedIndex = originalThread.likes.findIndex(({like}:any) => like.user.toString() === userId);
+    const hasLiked = originalThread?.likes?.some((like:mongoose.Types.ObjectId) => like.equals(JSON.parse(userId)));
+    // console.log(typeof(originalThread?.likes[0]));
+    
 
-    if (alreadyLikedIndex !== -1) {
+    if (hasLiked) {
       // If the user has already liked the thread, remove the like
-      originalThread.likes.splice(alreadyLikedIndex, 1);
+      originalThread.likes = originalThread?.likes.filter((like:mongoose.Types.ObjectId) => !like.equals(JSON.parse(userId)));
     } else {
       // If the user hasn't liked the thread, add the like
-      var objectId = new mongoose.Types.ObjectId('569ed8269353e9f4c51617aa');
-      originalThread.likes.push({ user: objectId });
+      originalThread?.likes.push(JSON.parse(userId));
     }
 
     // Save the updated thread back to the database
     await originalThread.save();
-
-    // Return the updated thread or a success message if needed
-    return originalThread;
+    // const hasLiked = originalThread?.likes.in
+    const likeInfo={
+      "length": originalThread.likes.length,
+      "hasLiked":originalThread?.likes.includes(JSON.parse(userId))
+    }
+    return likeInfo;
   } catch (err) {
-    console.error('Error while adding/removing like:', err);
-    throw new Error('Unable to add/remove like');
+    console.error('Error while liking comment:', err);
+    throw new Error('Unable to like comment');
+  }
+}
+
+export async function checkLikedOrNot(threadId: string, userId: string){
+  try {
+    // Find the original thread by its ID
+    
+    const originalThread = await Thread.findById(threadId);
+    // console.log(originalThread);
+    
+    if (!originalThread) {
+      throw new Error('Thread not found');
+    }
+
+    const likeInfo={
+      "length": originalThread.likes.length,
+      "hasLiked":originalThread?.likes.includes(JSON.parse(userId))
+    }
+    return likeInfo;
+  } catch (err) {
+    console.error('Error while checking like or not:', err);
+    throw new Error('Unable to check like in thread');
   }
 }

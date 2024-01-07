@@ -1,10 +1,17 @@
-// "use client"
+
 import Image from "next/image";
 import Link from "next/link";
 import LikedBtn from "./LikedBtn";
+import { fetchUser } from "@/lib/actions/user.action";
+import { currentUser } from "@clerk/nextjs";
+
+interface userr{
+  id:string;
+}
 
 interface Props{
     id : string;
+    // currentUser_id: string;
     currentUserId : string;
     parentId : string | null;
     content : string;
@@ -31,8 +38,10 @@ interface Props{
       }
   }[];
 }
-const ThreadCard =({
+
+const ThreadCard =async({
     id,
+    // currentUser_id,
     currentUserId,
     parentId,
     content,
@@ -43,16 +52,18 @@ const ThreadCard =({
     isComment,
     isLike
 }:Props)=>{
-
-    let objectId=id;
-    const idString = objectId.toString();
-
+    // console.log(isLike);
+    // console.log(currentUserId)
+    const use=  await currentUser();
+    // console.log(user.id);
+    const userInfo = await fetchUser(use?.id);
+    // console.log(userInfo);
     return (
-        <article
-      className={`flex w-full flex-col rounded-xl ${
+      <article
+        className={`flex w-full flex-col rounded-xl ${
         isComment ? "px-0 xs:px-7" : "bg-dark-2 p-7"
-      }`}
-    >
+        }`}
+      >
     <div className='flex items-start justify-between'>
         <div className='flex w-full flex-1 flex-row gap-4'>
           <div className='flex flex-col items-center'>
@@ -77,7 +88,16 @@ const ThreadCard =({
 
             <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
               <div className='flex gap-3.5'>
-                <LikedBtn threadId={idString} currentUserId={currentUserId} isLike={isLike}/>
+                <LikedBtn threadId={JSON.parse(JSON.stringify(id))} currentUserId={JSON.stringify(userInfo?._id)} isLike={isLike}/>
+                {/* <Image 
+                  src={isLike?.length>=1? '/assets/heart-filled.svg' : '/assets/heart-gray.svg'}
+                  alt='heart'
+                  width={24}
+                  height={24}
+                  className='cursor-pointer object-contain'
+                  // onClick={handleLikeClick}  
+                /> */}
+      
                 <Link href={`/thread/${id}`}>
                   <Image
                     src='/assets/reply.svg'
