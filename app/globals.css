@@ -20,7 +20,7 @@
     }
     /* Community Card */
     .community-card {
-        @apply w-full rounded-lg bg-dark-3 px-4 py-5 sm: w-96;
+        @apply w-[45%] rounded-lg bg-dark-3 px-4 py-5;
     }
     .community-card_btn {
         @apply rounded-lg bg-primary-500 px-5 py-1.5 text-small-regular !text-light-1 !important;
@@ -47,6 +47,14 @@
             /* Equivalent to xs: flex-row */
             align-items: center;
             /* Equivalent to xs: items-center */
+        }
+        .community-card {
+            width: 100%;
+            border-radius: 0.5rem;
+            background-color: #333;
+            padding-left: 1rem; 
+            padding-right: 1rem;
+            
         }
     }
     .user-card_avatar {

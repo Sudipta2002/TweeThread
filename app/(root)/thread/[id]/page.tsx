@@ -33,6 +33,7 @@ const Page = async({params}:{params:{id:string}})=>{
                     createdAt={thread.createdAt}
                     comments={thread.children}
                     isLike={originalThread?.likes}
+                    // isComment
                 />
             </div>
             <div className="mt-7">

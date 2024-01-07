@@ -4,6 +4,7 @@ import Link from "next/link";
 import LikedBtn from "./LikedBtn";
 import { fetchUser } from "@/lib/actions/user.action";
 import { currentUser } from "@clerk/nextjs";
+import { formatDateString } from "@/lib/utils";
 
 interface userr{
   id:string;
@@ -56,6 +57,7 @@ const ThreadCard =async({
     // console.log(currentUserId)
     const use=  await currentUser();
     // console.log(user.id);
+    if(!use)return null;
     const userInfo = await fetchUser(use?.id);
     // console.log(userInfo);
     return (
@@ -123,13 +125,13 @@ const ThreadCard =async({
                 />
               </div>
 
-              {false && comments.length > 0 && (
+              {/* {isComment && comments.length > 0 && (
                 <Link href={`/thread/${id}`}>
                   <p className='mt-1 text-subtle-medium text-gray-1'>
                     {comments.length} repl{comments.length > 1 ? "ies" : "y"}
                   </p>
                 </Link>
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -143,9 +145,9 @@ const ThreadCard =async({
         /> */}
     </div>
 
-      {/* {!false && comments.length > 0 && (
+      {!isComment && comments.length > 0 && (
         <div className='ml-1 mt-3 flex items-center gap-2'>
-          {comments.slice(0, 2).map((comment, index) => (
+          {comments.slice(0, 3).map((comment, index) => (
             <Image
               key={index}
               src={comment.author.image}
@@ -162,9 +164,9 @@ const ThreadCard =async({
             </p>
           </Link>
         </div>
-      )} */}
+      )}
 
-      {/* {!false && community && (
+      {!isComment && community && (
         <Link
           href={`/communities/${community.id}`}
           className='mt-5 flex items-center'
@@ -177,12 +179,12 @@ const ThreadCard =async({
           <Image
             src={community.image}
             alt={community.name}
-            width={14}
-            height={14}
+            width={24}
+            height={24}
             className='ml-1 rounded-full object-cover'
           />
         </Link>
-      )} */}
+      )}
         </article>
     )
 }
